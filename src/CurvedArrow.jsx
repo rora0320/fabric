@@ -61,51 +61,36 @@ const CurvedArrow = () => {
 
             canvas.add(arrowHeadShape);
         }
-        // function drawBentArrow() {
-        //     // Define the path for a bent arrow
-        //     // const arrowPath =new fabric.Path(`M 100 100 L 200 120 L 300 150 L 400 180 L 400 210 L 400 240 L 300 200 L 100 180 z M 400 240 L 400 180 L 320 250 L 200 400 z`,{
-        //     const arrowPath = new fabric.Path('M 100 100 L 200 100 L 200 150 L 300 150 L 300 175 L 200 175 L 200 250 L 100 250 z', {
-        //         fill: 'white', // Placeholder color before gradient
-        //         stroke: 'black',
-        //         strokeWidth: 2,
-        //     });
-        //
-        //     // Apply a gradient to simulate 3D shading
-        //     const gradient = new fabric.Gradient({
-        //         type: 'linear',
-        //         coords: { x1: 0, y1: 0, x2: 0, y2: arrowPath.height },
-        //         colorStops: [
-        //             { offset: 0, color: 'rgba(255, 255, 255, 0.9)' },  // Light color at the top
-        //             { offset: 0.5, color: 'rgba(0, 150, 255, 0.7)' },  // Mid-tone
-        //             { offset: 1, color: 'rgba(0, 100, 200, 1)' }      // Darker at the bottom
-        //         ]
-        //     });
-        //     arrowPath.set('fill', gradient);
 
-            // canvas.add(arrowPath);
-        // }
         // Draw a sample curved arrow (coordinates within canvas)
         drawCurvedArrow(canvas, 100, 100, 120, 150, 200, 150); // Adjusted controlY for a visible curve
-        // drawBentArrow();
-        // fabric.loadSVGFromURL('right-arrow.svg').then(({objects,options})=>{
-        //     console.log('objects',objects,'options',options);
-        //     // Check if objects are loaded
-        //     if (objects && objects.length > 0) {
-        //         // Group the SVG elements
-        //         const svgGroup = fabric.util.groupSVGElements(objects);
-        //         svgGroup.scaleToWidth(100);  // Scale the SVG
-        //         svgGroup.scaleToHeight(100);
-        //         svgGroup.set({ left: 150, top: 150 });  // Position the SVG
-        //
-        //         canvas.add(svgGroup);  // Add the SVG group to the canvas
-        //         canvas.renderAll();    // Render the canvas with the SVG added
-        //     } else {
-        //         console.error("No objects found in SVG");
-        //     }
-        // })
         // Clean up the canvas when the component unmounts
         return () => canvas.dispose();
     }, []);
+
+    // useEffect(() => {
+    //     const canvas = new fabric.Canvas(canvasRef2.current);
+    //
+    //     fabric.loadSVGFromURL('right-arrow.svg').then(({objects,options})=> {
+    //         console.log('objects', objects, 'options', options);
+    //         // Check if objects are loaded
+    //         if (objects && objects.length > 0) {
+    //             // Group the SVG elements
+    //             const svgGroup = fabric.util.groupSVGElements(objects);
+    //             svgGroup.scaleToWidth(100);  // Scale the SVG
+    //             svgGroup.scaleToHeight(100);
+    //             svgGroup.set({left: 150, top: 150});  // Position the SVG
+    //
+    //             canvas.add(svgGroup);  // Add the SVG group to the canvas
+    //             canvas.renderAll();    // Render the canvas with the SVG added
+    //         } else {
+    //             console.error("No objects found in SVG");
+    //         }
+    //     })
+    //
+    //     return () => canvas.dispose();
+    // }, []);
+
 
     return (
         <div>
