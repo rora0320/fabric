@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <g id="_15-Exchange" data-name="15-Exchange">
+<!--        <polygon points="39 43 39 48 27 36 27 31 39 43" style="fill:#ff6d04"/>-->
+<!--        <path d="M1,28c0,4,5,9,12,9H27v4H15C7,41,1,35.52,1,30Z" style="fill:#fa5f07"/>-->
+<!--        <polygon points="37 28 37 33 25 21 25 16 37 28" style="fill:#1c69a1"/>-->
+        <path d="M49,23c8,0,14,5.48,14,11v2c0-4-5-9-12-9H37V23Z" style="fill:#2a84c9"/>
+        <path d="M37,27v1L25,16,37,4V9h6A19.994,19.994,0,0,1,63,29v5c0-5.52-6-11-14-11H37Z" style="fill:#48befd"/>
+<!--        <path d="M1,30c0,5.52,6,11,14,11H27V36L39,48,27,60V55H21A19.994,19.994,0,0,1,1,35V30Z" style="fill:#fab503"/>-->
+<!--        화살표 곡선 하이라이터-->
+        <path d="M44.666,9.084A4.5,4.5,0,0,0,45.5,18h2.828A14.672,14.672,0,0,1,63,32.672V29A19.985,19.985,0,0,0,44.666,9.084Z"
+              style="fill:#6bdcff"/>
+<!--        <path d="M13.725,47H20a3,3,0,0,0,0-6H15C7,41,1,35.52,1,30v4.275A12.725,12.725,0,0,0,13.725,47Z"-->
+<!--              style="fill:#ffdb02"/>-->
+<!--        <path d="M16,39a1.994,1.994,0,0,1-1.7,1.97c.235.01.465.03.7.03H27V37H14A2,2,0,0,1,16,39Z" style="fill:#d65106"/>-->
+<!--        <path d="M48,25a1.994,1.994,0,0,1,1.7-1.97c-.235-.01-.465-.03-.7-.03H37v4H50A2,2,0,0,1,48,25Z"-->
+<!--              style="fill:#1c69a1"/>-->
+<!--        화살표 전체 라인-->
+        <path d="M43,9H37V4L25,16,37,28V23H49c8,0,14,5.477,14,11V29A20,20,0,0,0,43,9Z"
+              style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>
+<!--        화살표 3D아래쪽-->
+        <polyline points="25 16 25 21 37 33 37 28"
+                  style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>
+<!--        아래쪽 꼬리 -->
+        <path d="M44,27h7c7,0,12,5,12,9V33" style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>
+        <line x1="40" y1="27" x2="42" y2="27" style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>
+<!--        <path d="M21,55h6v5L39,48,27,36v5H15C7,41,1,35.523,1,30v5A20,20,0,0,0,21,55Z"-->
+<!--              style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>-->
+<!--        <polyline points="39 48 39 43 27 31 27 36"-->
+<!--                  style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>-->
+<!--        <path d="M20,37H13C6,37,1,32,1,28v3" style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>-->
+<!--        <line x1="24" y1="37" x2="22" y2="37" style="fill:none;stroke:#000;stroke-linejoin:round;stroke-width:2px"/>-->
+    </g>
+</svg>

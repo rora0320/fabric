@@ -65,7 +65,7 @@ const CurvedArrow = () => {
         // Draw a sample curved arrow (coordinates within canvas)
         // drawCurvedArrow(canvas, 100, 100, 300, 300, 200, 150); // Adjusted controlY for a visible curve
         // drawBentArrow();
-        fabric.loadSVGFromURL('person_Icon.svg').then(({objects,options})=>{
+        fabric.loadSVGFromURL('right-arrow.svg').then(({objects,options})=>{
             console.log('objects',objects,'options',options);
             // Check if objects are loaded
             if (objects && objects.length > 0) {
