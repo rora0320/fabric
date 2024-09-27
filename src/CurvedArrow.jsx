@@ -142,16 +142,73 @@ const CurvedArrow = () => {
             originY: 'center',
             angle: 90,
         });
+        // path polygon 을 그룹으로 만들고 싶으면
+        // const arrowGroup = new fabric.Group([rect, triangle], {
+        //     left: 100,  // Position group based on starting point
+        //     top: 100,
+        //     selectable: true,  // Enable selection and transformations
+        //     hasControls: true,  // Allow movement, rotation, and scaling
+        //     originX: 'center',
+        //     originY: 'center',
+        // });
+        // canvas.add(arrowGroup);
+
 
         // Add both the rectangle and triangle to the canvas
         canvas.add(rect);
         canvas.add(triangle);
 
+        //
+        //
+        // // Keep the triangle's left side attached to the rectangle's right side
+        // triangle.on('modified', () => {
+        //     rect.set({
+        //         width: triangle.left - rect.left, // Adjust the rectangle's width
+        //         top: triangle.top + (triangle.width/2),
+        //     });
+        //     canvas.renderAll();
+        // });
+        //
+        // // Event handler for moving the triangle and keeping the rectangle updated
+        // rect.on('modified', () => {
+        //     triangle.set({
+        //         left: rect.left + rect.width,
+        //         top: rect.top,
+        //     });
+        //     canvas.renderAll();
+        // });
+
+        // Custom control for adjusting the width of the triangle
+        triangle.controls.mtr  = new fabric.Control({
+            x: 0.5, // Position the control at the right edge of the triangle
+            y: 0,
+            offsetX: 20,
+            cursorStyle: 'ew-resize',
+            actionHandler: function (eventData, transform, x, y) {
+                const target = transform.target;
+                // const newWidth = target.width * target.scaleX + eventData.movementX;
+                // if (newWidth > 20) { // Minimum width
+                //     target.set({ scaleX: newWidth / target.width });
+                // }
+                const newHeight = target.height * target.scaleY + eventData.movementX;
+                if (newHeight > 20) { // Minimum height
+                    target.set({ scaleY: newHeight / target.height });
+                }
+                return true;
+            },
+            render: function (ctx, left, top, styleOverride, fabricObject) {
+                const size = 10;
+                ctx.save();
+                ctx.fillStyle = 'black';
+                ctx.fillRect(left - size / 2, top - size / 2, size, size); // Draw the control point
+                ctx.restore();
+            },
+        });
+
         // Keep the triangle's left side attached to the rectangle's right side
         triangle.on('modified', () => {
             rect.set({
                 width: triangle.left - rect.left, // Adjust the rectangle's width
-                top: triangle.top + (triangle.width/2),
             });
             canvas.renderAll();
         });
