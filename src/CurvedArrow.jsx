@@ -156,27 +156,7 @@ const CurvedArrow = () => {
 
         // Add both the rectangle and triangle to the canvas
         canvas.add(rect);
-        canvas.add(triangle);
-
-        //
-        //
-        // // Keep the triangle's left side attached to the rectangle's right side
-        // triangle.on('modified', () => {
-        //     rect.set({
-        //         width: triangle.left - rect.left, // Adjust the rectangle's width
-        //         top: triangle.top + (triangle.width/2),
-        //     });
-        //     canvas.renderAll();
-        // });
-        //
-        // // Event handler for moving the triangle and keeping the rectangle updated
-        // rect.on('modified', () => {
-        //     triangle.set({
-        //         left: rect.left + rect.width,
-        //         top: rect.top,
-        //     });
-        //     canvas.renderAll();
-        // });
+        canvas.add(triangle)
 
         // Custom control for adjusting the width of the triangle
         triangle.controls.mtr  = new fabric.Control({
@@ -209,6 +189,7 @@ const CurvedArrow = () => {
         triangle.on('modified', () => {
             rect.set({
                 width: triangle.left - rect.left, // Adjust the rectangle's width
+                top: triangle.top + (triangle.width/2),
             });
             canvas.renderAll();
         });
