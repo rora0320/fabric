@@ -3,6 +3,7 @@ import * as fabric from 'fabric';
 
 const CurvedArrow = () => {
     const canvasRef2 = useRef(null);
+    const canvasInstance = useRef(null);
 
     // useEffect(() => {
     //     // Check if canvas element is available
@@ -116,113 +117,57 @@ const CurvedArrow = () => {
     //
     //     return () => canvas.dispose();
     // }, []);
+const onClickDrawArray =()=>{
+    const canvas = canvasInstance.current;
+    // Create the rectangle (arrow shaft)
+    const rect = new fabric.Rect({
+        left: 100,
+        top: 150,
+        width: 100,
+        height: 20,
+        fill: 'blue',
+        originX: 'left',
+        originY: 'center',
+        selectable: true
+    });
 
+    // Create the triangle (arrowhead)
+    const triangle = new fabric.Triangle({
+        left: rect.left + rect.width,
+        top: rect.top - 40  ,
+        width: 80,
+        height: 80,
+        fill: 'red',
+        originX: 'left',
+        originY: 'center',
+        angle: 90,
+        selectable: true
+    });
+
+    canvas.add(rect,triangle)
+    // Update the positions to always stick together
+    canvas.on('object:moving', function (e) {
+        const obj = e.target;
+        if (obj === rect) {
+            triangle.set({
+                left: obj.left + obj.width * obj.scaleX,
+                top: obj.top -(triangle.width /2),
+            });
+        } else if (obj === triangle) {
+            rect.set({
+                left: obj.left - rect.width * rect.scaleX,
+                top: obj.top +(triangle.width/2)
+            });
+        }
+        canvas.renderAll();
+    });
+
+}
     useEffect(() => {
-        const canvas = new fabric.Canvas(canvasRef2.current);
-
-        // Create the rectangle (arrow shaft)
-        const rect = new fabric.Rect({
-            left: 100,
-            top: 150,
-            width: 100,
-            height: 20,
-            fill: 'blue',
-            originX: 'left',
-            originY: 'center',
-            selectable: true
-        });
-
-        // Create the triangle (arrowhead)
-        const triangle = new fabric.Triangle({
-            left: rect.left + rect.width,
-            top: rect.top - 40  ,
-            width: 80,
-            height: 80,
-            fill: 'red',
-            originX: 'left',
-            originY: 'center',
-            angle: 90,
-            selectable: true
-        });
-        // path polygon 을 그룹으로 만들고 싶으면
-        // const arrowGroup = new fabric.Group([rect, triangle], {
-        //     left: 100,  // Position group based on starting point
-        //     top: 100,
-        //     selectable: true,  // Enable selection and transformations
-        //     hasControls: true,  // Allow movement, rotation, and scaling
-        //     originX: 'center',
-        //     originY: 'center',
-        // });
-        // canvas.add(arrowGroup);
-
-        canvas.add(rect,triangle)
-        // Update the positions to always stick together
-        canvas.on('object:moving', function (e) {
-            const obj = e.target;
-            if (obj === rect) {
-                triangle.set({
-                    left: obj.left + obj.width * obj.scaleX,
-                    top: obj.top -(triangle.width /2),
-                });
-            } else if (obj === triangle) {
-                rect.set({
-                    left: obj.left - rect.width * rect.scaleX,
-                    top: obj.top +(triangle.width/2)
-                });
-            }
-            canvas.renderAll();
-        });
-        // Add both the rectangle and triangle to the canvas
-        // canvas.add(rect);
-        // canvas.add(triangle)
-        //
-        // // Custom control for adjusting the width of the triangle
-        // triangle.controls.mtr  = new fabric.Control({
-        //     x: 0.5, // Position the control at the right edge of the triangle
-        //     y: 0,
-        //     offsetX: 20,
-        //     cursorStyle: 'ew-resize',
-        //     actionHandler: function (eventData, transform, x, y) {
-        //         const target = transform.target;
-        //         // const newWidth = target.width * target.scaleX + eventData.movementX;
-        //         // if (newWidth > 20) { // Minimum width
-        //         //     target.set({ scaleX: newWidth / target.width });
-        //         // }
-        //         const newHeight = target.height * target.scaleY + eventData.movementX;
-        //         if (newHeight > 20) { // Minimum height
-        //             target.set({ scaleY: newHeight / target.height });
-        //         }
-        //         return true;
-        //     },
-        //     render: function (ctx, left, top, styleOverride, fabricObject) {
-        //         const size = 10;
-        //         ctx.save();
-        //         ctx.fillStyle = 'black';
-        //         ctx.fillRect(left - size / 2, top - size / 2, size, size); // Draw the control point
-        //         ctx.restore();
-        //     },
-        // });
-        //
-        // // Keep the triangle's left side attached to the rectangle's right side
-        // triangle.on('modified', () => {
-        //     rect.set({
-        //         width: triangle.left - rect.left, // Adjust the rectangle's width
-        //         top: triangle.top + (triangle.width/2),
-        //     });
-        //     canvas.renderAll();
-        // });
-        //
-        // // Event handler for moving the triangle and keeping the rectangle updated
-        // rect.on('modified', () => {
-        //     triangle.set({
-        //         left: rect.left + rect.width,
-        //         top: rect.top,
-        //     });
-        //     canvas.renderAll();
-        // });
+        canvasInstance.current  = new fabric.Canvas(canvasRef2.current);
 
         return () => {
-            canvas.dispose();
+            canvasInstance.current.dispose();
         };
     }, []);
 
@@ -230,6 +175,7 @@ const CurvedArrow = () => {
     return (
         <div>
             <h1>arrow</h1>
+            <button onClick={onClickDrawArray}>화살</button>
             {/* Add some styling to make sure the canvas is visible */}
             <canvas ref={canvasRef2} width="900" height="900" style={{ border: '1px solid blue' }}></canvas>
         </div>
