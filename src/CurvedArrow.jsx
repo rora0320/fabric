@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import * as fabric from 'fabric';
 
 const CurvedArrow = () => {
     const canvasRef2 = useRef(null);
     const canvasInstance = useRef(null);
-
+    const isDrawing = useRef(false);
+    const startPoint = useRef(null);
+    const currentArrow = useRef(null); // 현재 그리는 화살표를 저장
     // useEffect(() => {
     //     // Check if canvas element is available
     //     const canvas = new fabric.Canvas(canvasRef2.current);
@@ -117,56 +119,101 @@ const CurvedArrow = () => {
     //
     //     return () => canvas.dispose();
     // }, []);
-const onClickDrawArray =()=>{
-    const canvas = canvasInstance.current;
-    // Create the rectangle (arrow shaft)
-    const rect = new fabric.Rect({
-        left: 100,
-        top: 150,
-        width: 100,
-        height: 20,
-        fill: 'blue',
-        originX: 'left',
-        originY: 'center',
-        selectable: true
-    });
 
-    // Create the triangle (arrowhead)
-    const triangle = new fabric.Triangle({
-        left: rect.left + rect.width,
-        top: rect.top - 40  ,
-        width: 80,
-        height: 80,
-        fill: 'red',
-        originX: 'left',
-        originY: 'center',
-        angle: 90,
-        selectable: true
-    });
 
-    canvas.add(rect,triangle)
-    // Update the positions to always stick together
-    canvas.on('object:moving', function (e) {
-        const obj = e.target;
-        if (obj === rect) {
-            triangle.set({
-                left: obj.left + obj.width * obj.scaleX,
-                top: obj.top -(triangle.width /2),
-            });
-        } else if (obj === triangle) {
-            rect.set({
-                left: obj.left - rect.width * rect.scaleX,
-                top: obj.top +(triangle.width/2)
-            });
+    const onMouseDown = (event) => {
+        const canvas = canvasInstance.current;
+        const activeObject = canvas.getActiveObject();
+        if (activeObject) {
+            // If an object is selected, do not allow drawing
+            return;
         }
+
+        isDrawing.current=true;
+        // 클릭한 위치를 시작점으로 설정
+        const pointer = canvas.getPointer(event.e);
+        startPoint.current = pointer;
+        // 임시로 그릴 화살표 객체 생성 (이동 중 업데이트)
+        const rect = new fabric.Rect({
+            left: pointer.x,
+            top: pointer.y,
+            width: 0, // 드래그 중에는 크기가 0
+            height: 5,
+            fill: 'blue',
+            originX: 'left',
+            originY: 'center',
+            selectable: false,
+        });
+
+        const triangle = new fabric.Triangle({
+            left: pointer.x,
+            top: pointer.y,
+            width: 20,
+            height: 20,
+            fill: 'red',
+            originX: 'left',
+            originY: 'center',
+            angle: 180,
+            selectable: false,
+        });
+
+        // 캔버스에 추가하고 참조 저장
+        canvas.add(rect, triangle);
+        currentArrow.current = { rect, triangle };
+    };
+
+    const onMouseMove = (event) => {
+        const canvas = canvasInstance.current;
+        if (!isDrawing.current || !startPoint.current) return;
+
+        const pointer = canvas.getPointer(event.e);
+        const xDiff = pointer.x - startPoint.current.x;
+        const yDiff = pointer.y - startPoint.current.y;
+        const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        const angle = (Math.atan2(yDiff, xDiff) * 180) / Math.PI; // 각도 계산
+
+        const { rect, triangle } = currentArrow.current;
+
+        // 실시간으로 화살표의 크기와 각도 업데이트
+        rect.set({
+            width: distance,
+            angle: angle,
+            selectable: true,
+        });
+
+        triangle.set({
+            left: pointer.x,
+            top: pointer.y,
+            angle: angle+90,
+            originX: 'center',
+            originY: 'center',
+            selectable: true,
+        });
+
         canvas.renderAll();
-    });
+    };
 
-}
+    const onMouseUp = (event) => {
+        // const canvas = canvasInstance.current;
+        if (!isDrawing.current) return;
+
+        // 드래그 종료
+        isDrawing.current = false;
+        currentArrow.current = null; // 현재 그리는 화살표 초기화
+    };
+
     useEffect(() => {
-        canvasInstance.current  = new fabric.Canvas(canvasRef2.current);
+        const canvas = new fabric.Canvas(canvasRef2.current);
 
+        canvas.on('mouse:down', onMouseDown);
+        canvas.on('mouse:move', onMouseMove);
+        canvas.on('mouse:up', onMouseUp);
+
+        canvasInstance.current = canvas;
         return () => {
+            canvas.off('mouse:down', onMouseDown);
+            canvas.off('mouse:move', onMouseMove);
+            canvas.off('mouse:up', onMouseUp);
             canvasInstance.current.dispose();
         };
     }, []);
@@ -175,7 +222,7 @@ const onClickDrawArray =()=>{
     return (
         <div>
             <h1>arrow</h1>
-            <button onClick={onClickDrawArray}>화살</button>
+            {/*<button onClick={onClickDrawArray}>화살</button>*/}
             {/* Add some styling to make sure the canvas is visible */}
             <canvas ref={canvasRef2} width="900" height="900" style={{ border: '1px solid blue' }}></canvas>
         </div>
