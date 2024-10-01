@@ -193,9 +193,27 @@ const CurvedArrow = () => {
         canvas.renderAll();
     };
 
-    const onMouseUp = (event) => {
-        // const canvas = canvasInstance.current;
+    const onMouseUp = () => {
+        const canvas = canvasInstance.current;
         if (!isDrawing.current) return;
+        const { rect, triangle } = currentArrow.current;
+
+        // Create a group with the rect and triangle
+        const group = new fabric.Group([rect, triangle], {
+            selectable: true, // Allow the group to be selected
+            hasControls: true, // Show controls for resizing/rotating the group
+            lockScalingY: true, // Restrict scaling to only the x-axis if necessary
+        });
+
+        // Add the group to the canvas
+        canvas.add(group);
+
+        // Remove individual objects from the canvas (as they are now part of the group)
+        canvas.remove(rect);
+        canvas.remove(triangle);
+
+        // Render the canvas to reflect the changes
+        canvas.renderAll();
 
         // 드래그 종료
         isDrawing.current = false;
