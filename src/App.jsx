@@ -1,13 +1,11 @@
 import './App.css'
-
-import CurvedArrow from "./CurvedArrow.jsx";
+import DrawFabric from "./Drawfabric.jsx";
 
 function App() {
 
   return (
     <>
-        {/*<Fabric/>*/}
-        <CurvedArrow/>
+        <DrawFabric/>
     </>
   )
 }
