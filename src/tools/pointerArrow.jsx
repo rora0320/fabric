@@ -30,6 +30,7 @@ const PointerArrow = ({canvas}) => {
 
                             // 삼각형이 이동할 때 연결된 rect와 circle도 함께 이동
                             const rect = clickedObject.find(o => o.type === 'rect');
+                            const triangle = clickedObject.find(o => o.type === 'triangle');
 
                             if (rect) {
                                 const xDiff = pointer.x - startPoint.current.x ;
@@ -41,6 +42,14 @@ const PointerArrow = ({canvas}) => {
                                 rect.set({
                                     width: distance,
                                     angle: angle,
+                                });
+
+                                triangle.set({
+                                    angle: angle+90,
+                                    originX: 'center',
+                                    originY: 'center',
+                                    selectable: true,
+                                    hasControls: true,
                                 });
                             }
 
@@ -101,7 +110,6 @@ const PointerArrow = ({canvas}) => {
             originX: "center",
             originY: "center",
             selectable: true, // 텍스트 박스 수정 가능하게 함
-            text: String("Some text")
         });
 
         // 동그라미와 텍스트를 그룹화
