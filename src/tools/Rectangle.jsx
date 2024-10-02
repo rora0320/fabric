@@ -26,7 +26,7 @@ const Rectangle = ({canvas}) => {
             fill: 'green',
             originX: 'left',
             originY: 'top',
-            selectable: false,
+            selectable: true,
         });
 
         currentShape.current = rect;

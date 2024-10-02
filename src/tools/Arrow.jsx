@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
-import * as fabric from "fabric";
+import * as fabric from 'fabric';
 
-const CurvedArrow = ({canvas}) => {
+const Arrow = ({canvas}) => {
     const isDrawing = useRef(false);
     const startPoint = useRef(null);
     const currentArrow = useRef(null);
@@ -57,7 +57,7 @@ const CurvedArrow = ({canvas}) => {
         const angle = (Math.atan2(yDiff, xDiff) * 180) / Math.PI; // 각도 계산
 
         const {rect,triangle} = currentArrow.current ;
-
+        
         // Update rectangle width (arrow shaft)
         rect.set({
             width: distance,
@@ -96,7 +96,7 @@ const CurvedArrow = ({canvas}) => {
 
         // Render the canvas to reflect the changes
         canvas.renderAll();
-
+        
         //드래그 종료
         isDrawing.current = false;
         canvas.current = null; // Reset after drawing is complete
@@ -120,4 +120,4 @@ const CurvedArrow = ({canvas}) => {
     return null; // This component does not render any UI, just adds behavior
 };
 
-export default CurvedArrow;
+export default Arrow;

@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import * as fabric from 'fabric';
-import CurvedArrow from "./tools/CurvedArrow.jsx";
+import Arrow from "./tools/Arrow.jsx";
 import Rectangle from "./tools/Rectangle.jsx";
+import CurvedArrow from "./tools/CurvedArrow.jsx";
 
 const Drawfabric = () => {
     const canvasRef = useRef(null);
@@ -20,10 +21,21 @@ const Drawfabric = () => {
         };
     }, []);
 
+    const ComponentFromTool=()=>{
+        switch (selectedTool) {
+            case 'arrow':
+                return <Arrow canvas={canvasInstance.current}/>
+            case 'rectangle':
+                return <Rectangle canvas={canvasInstance.current} />
+            case 'curvedArrow':
+                return <CurvedArrow canvas={canvasInstance.current}/>
+            default:
+                return null;
+        }
+    }
     return (
         <div>
-            {selectedTool === 'arrow' && <CurvedArrow canvas={canvasInstance.current} />}
-            {selectedTool === 'rectangle' && <Rectangle canvas={canvasInstance.current} />}
+            {ComponentFromTool()}
             <div>
                 <button onClick={() => setSelectedTool('arrow')}>Arrow Tool</button>
                 <button onClick={() => setSelectedTool('rectangle')}>Rectangle Tool</button>
