@@ -4,6 +4,7 @@ import Arrow from "./tools/Arrow.jsx";
 import Rectangle from "./tools/Rectangle.jsx";
 import CurvedArrow from "./tools/CurvedArrow.jsx";
 import PointerArrow from "./tools/pointerArrow.jsx";
+import SelectedObject from "./tools/SelectedObject.jsx";
 
 const Drawfabric = () => {
     const canvasRef = useRef(null);
@@ -32,6 +33,8 @@ const Drawfabric = () => {
                 return <CurvedArrow canvas={canvasInstance.current}/>
             case 'pointerArrow':
                 return <PointerArrow canvas={canvasInstance.current}/>
+            case 'selectedObject':
+                return <SelectedObject canvas={canvasInstance.current}/>
             default:
                 return null;
         }
@@ -44,6 +47,7 @@ const Drawfabric = () => {
                 <button onClick={() => setSelectedTool('rectangle')}>Rectangle Tool</button>
                 <button onClick={() => setSelectedTool('curvedArrow')}>curvedArrow Tool</button>
                 <button onClick={() => setSelectedTool('pointerArrow')}>pointerArrow Tool</button>
+                <button onClick={() => setSelectedTool('selectedObject')}>selectedObject Tool</button>
             </div>
             <h1>arrow</h1>
             {/*<button onClick={onClickDrawArray}>화살</button>*/}
