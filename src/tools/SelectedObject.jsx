@@ -6,6 +6,8 @@ const SelectedObject = ({canvas}) => {
     const startPoint = useRef([]);
     const [line, setLine] = useState(null); // 현재 그려지고 있는 라인
     const [path, setPath] = useState(null);
+    const [handles, setHandles] = useState([]); // 핸들을 관리할 상태
+
 
     console.log('path???',path)
     // 마우스 다운 이벤트 핸들러 (드로잉 시작)
@@ -19,6 +21,10 @@ const SelectedObject = ({canvas}) => {
             // 더블 클릭일 경우, 마우스 다운 이벤트 무시
             const selectedObject = canvas.getActiveObject();
             if(selectedObject){
+                selectedObject.set({
+                    selectable:true,
+                    hasBorders: true,
+                })
                 isDrawing.current = false;
                 return
             }else{
@@ -77,7 +83,7 @@ const SelectedObject = ({canvas}) => {
                 hasBorders: true // 테두리 보이기
             });
 
-            setPath('');
+            // setPath('');
             canvas.add(newPath);
             isDrawing.current = false;
             startPoint.current = [];
@@ -87,16 +93,26 @@ const SelectedObject = ({canvas}) => {
             existingLine.forEach((path) => {
                 canvas.remove(path);
             });
+            console.log('newPath',newPath)
+            setPath(newPath)
         }
 
         canvas.renderAll();
     };
 
+    // 마우스 더블클릭 이벤트
     const handleDoubleClick = (opt) => {
+
         const target = canvas.getObjects();
-        console.log('??????더블클릭?????????',target)
-        if (target && target.type === 'path') {
-            target.set('fill', 'red'); // 선택된 경로를 빨간색으로 설정 (예시)
+        if (target[0] && target[0].type === 'path') {
+            target[0].set({
+                selectable: false, // 선택 불가
+                evented: false,    // 이벤트 발생 안 함
+                hasControls: false, // 크기 조절 핸들 숨기기
+                hasBorders: true
+            })
+            addHandlesToPath(target[0]);
+            setPath(target[0])
             canvas.renderAll();
         }
     }
@@ -117,13 +133,16 @@ const SelectedObject = ({canvas}) => {
 
     // ESC 키 이벤트 리스너
     const handleKeyDown = (event) => {
+        const target = canvas.getObjects()
+        console.log('esc 이벤트 target',target)
         if (event.key === 'Escape') {
             isDrawing.current = false;
             startPoint.current = [];
             setLine(null);
-            // if (path) {
-            //     path.set({ selectable: true }); // 다시 선택 가능하게 설정
-            // }
+            // 기존 핸들 제거
+            handles.forEach((handle) => {
+                canvas.remove(handle);
+            });
             canvas.renderAll(); // 캔버스 다시 렌더링
         }
     };
@@ -151,12 +170,18 @@ const SelectedObject = ({canvas}) => {
         };
     }, [canvas, isDrawing, path, line]);
 
-// 객체별로 핸들을 추가하는 로직
-    const addPointForPoly = (polygon) => {
-        polygon.points.forEach((point, index) => {
+    // 핸들을 추가하는 함수
+    const addHandlesToPath = (targetPath) => {
+        const pathPoints = targetPath.path.map((point) => ({ x: point[1], y: point[2] })); // Path의 점들 가져오기
+        // 기존 핸들 제거
+        handles.forEach((handle) => {
+            canvas.remove(handle);
+        });
+
+        const newHandles = pathPoints.map((point,index) => {
             const handle = new fabric.Circle({
-                left: point.x,
-                top: point.y,
+                left: point.x ,
+                top: point.y ,
                 radius: 5,
                 fill: 'blue',
                 originX: 'center',
@@ -165,10 +190,45 @@ const SelectedObject = ({canvas}) => {
                 hasControls: false,
             });
 
-            // 핸들이 움직일 때마다 폴리곤 좌표 수정
-            onHandleMove(handle, polygon);
+            // 핸들 이동 시 경로 업데이트
+            handle.on('moving', () => {
+                const newPoints = targetPath.path.map((p, i) => {
+                    if (i === index) {
+                        return [p[0], handle.left, handle.top]; // 핸들 위치로 업데이트
+                    }
+                    return p;
+                });
+
+                path.set({ path: newPoints });
+                canvas.renderAll();
+            });
+
             canvas.add(handle);
+            return handle;
         });
+
+        // path 이동 이벤트 핸들러 추가
+        targetPath.on('moving', () => {
+            const pathLeftOffset = targetPath.left - targetPath._originalLeft; // 원래 위치와의 차이 계산
+            const pathTopOffset = targetPath.top - targetPath._originalTop;
+
+            newHandles.forEach((handle, index) => {
+                const currentPathPoint = targetPath.path[index]; // 해당 인덱스의 경로 점
+                if (currentPathPoint) {
+                    handle.set({
+                        left: currentPathPoint[1]  + pathLeftOffset  , // pathOffset을 보정하여 핸들 좌표 설정
+                        top: currentPathPoint[2] + pathTopOffset
+                    });
+                }
+            });
+            canvas.renderAll();
+        });
+
+        // 초기 위치 저장 (경로 이동에 대비)
+        targetPath._originalLeft = targetPath.left;
+        targetPath._originalTop = targetPath.top;
+
+        setHandles(newHandles); // 상태 업데이트
     };
 
 
