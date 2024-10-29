@@ -20,6 +20,7 @@ const SelectedObject = ({canvas}) => {
             // 첫 번째 점이면 그리기 시작
             // 더블 클릭일 경우, 마우스 다운 이벤트 무시
             const selectedObject = canvas.getActiveObject();
+            console.log('클릭 오브젝트 ',selectedObject)
             if(selectedObject){
                 selectedObject.set({
                     selectable:true,
@@ -79,7 +80,7 @@ const SelectedObject = ({canvas}) => {
                 stroke: 'blue',
                 strokeWidth: 2,
                 selectable: true, // 이동 가능하게 설정
-                hasControls: true, // 컨트롤러를 활성화하여 크기 조정 가능
+                hasControls: false, // 컨트롤러를 활성화하여 크기 조정 가능
                 hasBorders: true // 테두리 보이기
             });
 
@@ -103,16 +104,17 @@ const SelectedObject = ({canvas}) => {
     // 마우스 더블클릭 이벤트
     const handleDoubleClick = (opt) => {
 
-        const target = canvas.getObjects();
-        if (target[0] && target[0].type === 'path') {
-            target[0].set({
+        const target = canvas.getActiveObject(opt.e);
+        if (target && target.type === 'path') {
+            target.set({
                 selectable: false, // 선택 불가
-                evented: false,    // 이벤트 발생 안 함
                 hasControls: false, // 크기 조절 핸들 숨기기
-                hasBorders: true
+                hasBorders: true,
+                evented:false
             })
-            addHandlesToPath(target[0]);
-            setPath(target[0])
+            setPath(target)
+            addHandlesToPath(target);
+            canvas.setActiveObject(target);
             canvas.renderAll();
         }
     }
@@ -121,7 +123,7 @@ const SelectedObject = ({canvas}) => {
     const generatePathString = (points) => {
         let pathString = `M ${points[0].x} ${points[0].y}`;
         for (let i = 1; i < points.length; i++) {
-            pathString += ` L ${points[i].x} ${points[i].y}`;
+            pathString +=  `L ${points[i].x} ${points[i].y}`;
         }
         return pathString;
     };
@@ -133,9 +135,13 @@ const SelectedObject = ({canvas}) => {
 
     // ESC 키 이벤트 리스너
     const handleKeyDown = (event) => {
-        const target = canvas.getObjects()
-        console.log('esc 이벤트 target',target)
+
         if (event.key === 'Escape') {
+        path.set({
+            selectable:true,
+            evented:true
+        });
+        canvas.setActiveObject(path);
             isDrawing.current = false;
             startPoint.current = [];
             setLine(null);
@@ -178,10 +184,11 @@ const SelectedObject = ({canvas}) => {
             canvas.remove(handle);
         });
 
+        console.log('target Path',targetPath)
         const newHandles = pathPoints.map((point,index) => {
             const handle = new fabric.Circle({
-                left: point.x ,
-                top: point.y ,
+                left: point.x,
+                top: point.y,
                 radius: 5,
                 fill: 'blue',
                 originX: 'center',
@@ -200,7 +207,7 @@ const SelectedObject = ({canvas}) => {
                 });
 
                 path.set({ path: newPoints });
-                canvas.renderAll();
+                // canvas.renderAll();
             });
 
             canvas.add(handle);
@@ -212,6 +219,7 @@ const SelectedObject = ({canvas}) => {
             const pathLeftOffset = targetPath.left - targetPath._originalLeft; // 원래 위치와의 차이 계산
             const pathTopOffset = targetPath.top - targetPath._originalTop;
 
+            //path 이동시 핸들러도 같이 움직이는 곳
             newHandles.forEach((handle, index) => {
                 const currentPathPoint = targetPath.path[index]; // 해당 인덱스의 경로 점
                 if (currentPathPoint) {
