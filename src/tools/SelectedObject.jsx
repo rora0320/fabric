@@ -178,7 +178,9 @@ const SelectedObject = ({canvas}) => {
 
     // 핸들을 추가하는 함수
     const addHandlesToPath = (targetPath) => {
-        const pathPoints = targetPath.path.map((point) => ({ x: point[1], y: point[2] })); // Path의 점들 가져오기
+        const initialOffsetLeft  = targetPath.path[0][1] - targetPath.left
+        const initialOffsetTop  = targetPath.path[0][2] - targetPath.top
+        const pathPoints = targetPath.path.map((point) => ({ x: point[1]-initialOffsetLeft, y: point[2]-initialOffsetTop })); // Path의 점들 가져오기
         // 기존 핸들 제거
         handles.forEach((handle) => {
             canvas.remove(handle);
@@ -201,7 +203,7 @@ const SelectedObject = ({canvas}) => {
             handle.on('moving', () => {
                 const newPoints = targetPath.path.map((p, i) => {
                     if (i === index) {
-                        return [p[0], handle.left, handle.top]; // 핸들 위치로 업데이트
+                        return [p[0], handle.left+initialOffsetLeft , handle.top+initialOffsetTop ]; // 핸들 위치로 업데이트
                     }
                     return p;
                 });
@@ -214,7 +216,7 @@ const SelectedObject = ({canvas}) => {
             return handle;
         });
 
-        // path 이동 이벤트 핸들러 추가
+        // path 이동(path+handle 전체이동) 이벤트 핸들러 추가
         targetPath.on('moving', () => {
             const pathLeftOffset = targetPath.left - targetPath._originalLeft; // 원래 위치와의 차이 계산
             const pathTopOffset = targetPath.top - targetPath._originalTop;
@@ -224,8 +226,8 @@ const SelectedObject = ({canvas}) => {
                 const currentPathPoint = targetPath.path[index]; // 해당 인덱스의 경로 점
                 if (currentPathPoint) {
                     handle.set({
-                        left: currentPathPoint[1]  + pathLeftOffset  , // pathOffset을 보정하여 핸들 좌표 설정
-                        top: currentPathPoint[2] + pathTopOffset
+                        left: currentPathPoint[1] + pathLeftOffset - initialOffsetLeft, // pathOffset을 보정하여 핸들 좌표 설정
+                        top: currentPathPoint[2] + pathTopOffset - initialOffsetTop,
                     });
                 }
             });
