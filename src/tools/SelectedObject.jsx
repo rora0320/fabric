@@ -8,19 +8,19 @@ const SelectedObject = ({canvas}) => {
     const [path, setPath] = useState(null);
     const [handles, setHandles] = useState([]); // 핸들을 관리할 상태
 
-
-    console.log('path???',path)
     // 마우스 다운 이벤트 핸들러 (드로잉 시작)
     const handleMouseDown = (opt) => {
-
         const pointer = canvas.getPointer(opt.e);
         const newPoint = { x: pointer.x, y: pointer.y };
+        // if(opt.e.detail === 2){
+        //     console.log('더블 클릭 테스트 test')
+        //     return
+        // }
         //
         if (!isDrawing.current) {
             // 첫 번째 점이면 그리기 시작
             // 더블 클릭일 경우, 마우스 다운 이벤트 무시
             const selectedObject = canvas.getActiveObject();
-            console.log('클릭 오브젝트 ',selectedObject)
             if(selectedObject){
                 selectedObject.set({
                     selectable:true,
@@ -81,9 +81,12 @@ const SelectedObject = ({canvas}) => {
                 strokeWidth: 2,
                 selectable: true, // 이동 가능하게 설정
                 hasControls: false, // 컨트롤러를 활성화하여 크기 조정 가능
-                hasBorders: true // 테두리 보이기
+                hasBorders: true, // 테두리 보이기
             });
-
+            newPath.set({
+                kh_T:newPath.top,
+                kh_L:newPath.left
+            })
             // setPath('');
             canvas.add(newPath);
             isDrawing.current = false;
@@ -94,7 +97,7 @@ const SelectedObject = ({canvas}) => {
             existingLine.forEach((path) => {
                 canvas.remove(path);
             });
-            console.log('newPath',newPath)
+
             setPath(newPath)
         }
 
@@ -110,11 +113,13 @@ const SelectedObject = ({canvas}) => {
                 selectable: false, // 선택 불가
                 hasControls: false, // 크기 조절 핸들 숨기기
                 hasBorders: true,
-                evented:false
+                evented:false,
+
             })
-            setPath(target)
+
+            // setPath(target)
             addHandlesToPath(target);
-            canvas.setActiveObject(target);
+            // canvas.setActiveObject(target);
             canvas.renderAll();
         }
     }
@@ -152,6 +157,18 @@ const SelectedObject = ({canvas}) => {
             canvas.renderAll(); // 캔버스 다시 렌더링
         }
     };
+    // const handleObjectMove=(event)=>{
+    //     const obj = event.target;
+    //     console.log('누구 오브젝트니',obj)
+    //     const boundingBox = obj.getBoundingRect();
+    //     // Adjust view transform if needed
+    //     if (boundingBox.left < 0 || boundingBox.top < 0 ||
+    //         boundingBox.left + boundingBox.width > canvas.width ||
+    //         boundingBox.top + boundingBox.height > canvas.height) {
+    //         canvas.viewportTransform[4] -= boundingBox.left < 0 ? boundingBox.left : 0;
+    //         canvas.viewportTransform[5] -= boundingBox.top < 0 ? boundingBox.top : 0;
+    //     }
+    // }
 
 
     // 캔버스를 초기화하고 이벤트 리스너 등록
@@ -162,6 +179,7 @@ const SelectedObject = ({canvas}) => {
         canvas.on('mouse:down', handleMouseDown);
         canvas.on('mouse:move', handleMouseMove);
         canvas.on('mouse:up', handleMouseUp);
+        // canvas.on('object:moving',handleObjectMove)
 
         // 더블 클릭 이벤트 핸들러 등록
         canvas.on('mouse:dblclick', handleDoubleClick);
@@ -172,22 +190,29 @@ const SelectedObject = ({canvas}) => {
             canvas.off('mouse:move', handleMouseMove);
             canvas.off('mouse:up', handleMouseUp);
             canvas.off('mouse:dblclick',handleDoubleClick);
+            // canvas.off('object:moving',handleObjectMove)
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [canvas, isDrawing, path, line]);
 
     // 핸들을 추가하는 함수
     const addHandlesToPath = (targetPath) => {
-        const initialOffsetLeft  = targetPath.path[0][1] - targetPath.left
-        const initialOffsetTop  = targetPath.path[0][2] - targetPath.top
+        const littleTop = targetPath.kh_T - targetPath.path[0][2];
+        const littleLeft = targetPath.kh_L - targetPath.path[0][1];
+        //이동한 위치의 top위치로는 이동
+        const initialOffsetLeft  = targetPath.path[0][1] - targetPath.left +littleLeft
+        const initialOffsetTop  = targetPath.path[0][2] - targetPath.top +littleTop
+
+
         const pathPoints = targetPath.path.map((point) => ({ x: point[1]-initialOffsetLeft, y: point[2]-initialOffsetTop })); // Path의 점들 가져오기
+
         // 기존 핸들 제거
         handles.forEach((handle) => {
             canvas.remove(handle);
         });
 
-        console.log('target Path',targetPath)
         const newHandles = pathPoints.map((point,index) => {
+
             const handle = new fabric.Circle({
                 left: point.x,
                 top: point.y,
@@ -207,11 +232,9 @@ const SelectedObject = ({canvas}) => {
                     }
                     return p;
                 });
-
                 path.set({ path: newPoints });
                 // canvas.renderAll();
             });
-
             canvas.add(handle);
             return handle;
         });
