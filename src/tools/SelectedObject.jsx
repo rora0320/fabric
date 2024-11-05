@@ -151,6 +151,8 @@ const SelectedObject = ({canvas}) => {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     };
 
+    // esc 누르면 실행될 함수
+    // 라인들로 path 구성함
     const pathForLines = () => {
         const pathCoords = [`M ${line[0].x1} ${line[0].y1}`];
         line.forEach((l) => {
@@ -161,8 +163,7 @@ const SelectedObject = ({canvas}) => {
             fill: '',
             stroke: 'black',
             strokeWidth: 2,
-            selectable: true,
-            evented: true
+
         });
         newPath.set({
             kh_T: newPath.top,
@@ -183,7 +184,8 @@ const SelectedObject = ({canvas}) => {
 
             setPath.current.set({
                 selectable: true,
-                evented: true
+                evented: true,
+                hasBorders: true,
             });
 
             canvas.setActiveObject(setPath.current);
